@@ -1,0 +1,11 @@
+Package: nonparametricSummaryPSM
+Type: Package
+Title: Nonparametric methods to find optimal weights to combine posterior similarity matrices
+Version: 0.1.0
+Author: Magdalena Strauss
+Maintainer: Magdalena Strauss <ms58@sanger.ac.uk>
+Description:  The purpose of this code is to compute summary PSMs (posterior similarity matrices) from a set of multiple PSMs obtained for instance by means of subsampling. This implements the Dirichlet process and Pitman-Yor process based methods for combining PSMs proposed in Strauss et al. (2019). GPseudoClust: deconvolution of shared pseudo-trajectories at single-cell resolution.
+License: GPL-3.0
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 6.1.1
