@@ -1,1 +1,4 @@
 exportPattern("^[[:alpha:]]+")
+import(mcclust)
+import(PReMiuM)
+import(coda)

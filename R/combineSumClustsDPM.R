@@ -3,11 +3,6 @@
 #' for combining PSMs proposed in Strauss et al. Unravelling shared pseudo-trajectories at single-cell resolution.
 
 
-library(PReMiuM)
-library(mcclust)
-library(ClusterR)
-
-
 #' Internal function
 #' @title computeSumClustPear
 #' @param PSM posterior similarity matrix
@@ -160,3 +155,83 @@ processPSMs <- function(PSMs)
 
 }
 
+
+#' @title checkConvergence
+#' @param PSMs 3-dimensional array of PSMs, for each j PSMs[,,j] is the PSM of subsampled chain j, j = 1, ..., m
+#' @return results: list of length m-1 of results of processPSM function applied to the following subsets of PSMs: 1,2; 1,2,3; 1,2,3,4; ... 1,2,...,m
+#' @return coph: vector of length m-1 of cophenetic correlation coefficients measuring how well the summary PSM obtained using the PY+PEAR method on the first
+#' k submatrices (k=1, ..., l) is described by a hierarchcial clustering tree for a summary PSM based on the first l subsampled chains
+#' @return coph_DP: as coph, but for summary PSMs obtained by the DPM+PEAR method
+#' @return distPY: vector of length m-2 of Frobenius (Euclidean) norm of distances between consecutive summary PSMs, that is summary PSMs obtained from chains 1,2,..,k,k+1 and 1,2,...k (PY+PEAR)
+#' @return distDP: as distPY, but for DPM+PEAR method
+#' @author Magdalena Strauss
+#' @export
+checkConvergence <- function(PSMs)
+{
+  #use processPMs function to compute summary PSMs for chains 1:M, where M = 2, ..., number of chains
+  #then compute cophenetic correlation for all of these, to see how it changes across the number of PSMs
+  #also includes test for testing if PSMs are the same
+  L = dim(PSMs)[3]
+  results <- list()
+  coph <- list()
+  coph_DP <- list()
+  distPY <- c()
+  distDP <- c()
+  for (l in 2:L)
+  {
+    PSMs1 = PSMs[,,1:l]
+    results[[l-1]] <- processPSMs(PSMs1)
+    MPY <- results[[l-1]]$weightedPSM
+    MDP <- results[[l-1]]$weightedPSM_DP
+  }
+  for (l in 2:(L-1))
+  {
+    distPY <- c(distPY,norm(results[[l]]$weightedPSM-results[[l-1]]$weightedPSM,"f"))
+    distDP <- c(distDP,norm(results[[l]]$weightedPSM_DP-results[[l-1]]$weightedPSM_DP,"f"))
+    hClust <- hclust(dist(1-results[[l]]$weightedPSM),method="average")
+    cophHClust <- cophenetic(hClust)
+    hClustDP <- hclust(dist(1-results[[l]]$weightedPSM_DP),method="average")
+    cophHClustDP <- cophenetic(hClustDP)
+    aa <- rep(0,l)
+    bb <- rep(0,l)
+    for (k in 1:l)
+    {
+      aa[k] <- cor(dist(1-results[[k]]$weightedPSM),cophHClust)
+      bb[k] <- cor(dist(1-results[[k]]$weightedPSM_DP),cophHClustDP)
+    }
+    coph[[l-1]] <- aa
+    coph_DP[[l-1]] <- bb
+  }
+  return(list(results=results,coph=coph,coph_DP=coph_DP,distPY=distPY,distDP=distDP))
+}
+
+#' @title RhatConcentration
+#' @param concentrationSamples: nIterations x nChains matrix of nIterations samples of the concentration
+#' parameter alpha for each of nChains subsampled chains
+#' @param nChainsTest: number of subsamples for which we want to test if the number of sufficient for convergence
+#' @return GR-statistics across subsampled chains (see Strauss et al. 2019) for groups of
+#' @author Magdalena Strauss
+#' @export
+RhatConcentration <- function(concentrationSamples,nChainsTest)
+{
+  nChains <- ncol(concentrationSamples)
+  nn <- floor(nrow(concentrationSamples)/2)
+  concentrationSamples <- concentrationSamples[-(1:nn),]
+  a <- floor(nChains/nChainsTest)
+  output <- c()
+  for (k in 1:10){
+    yy <- 1:nChains
+    data <- c()
+    for (l in 1:a){
+      xx <- sample(yy,nChainsTest,replace = F)
+      yy <- setdiff(yy,xx)
+      x <- as.vector(concentrationSamples[,xx])
+      names(x) <- NULL
+      data <- rbind(data,x)
+    }
+    x1MC = as.mcmc.list(lapply(as.data.frame(t(data)), mcmc))
+    XX1 = gelman.diag(x1MC,transform = F,autoburnin = F)
+    output <- append(output,XX1[[1]][[1]])
+  }
+  return(output)
+}

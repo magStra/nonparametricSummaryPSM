@@ -14,6 +14,9 @@ Summary clustering computed using the PEAR criterion (Fritsch and Ickstadt, 2009
  (Fritsch, 2012))
 }
 \description{
+Compute summary PSMs (posterior similarity matrices) from a set of multiple PSMs obtained for instance
+by means of subsampling. This implements the Dirichlet process and Pitman-Yor process based methods
+for combining PSMs proposed in Strauss et al. Unravelling shared pseudo-trajectories at single-cell resolution.
 Internal function
 }
 \author{
