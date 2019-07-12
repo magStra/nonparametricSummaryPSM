@@ -1,0 +1,85 @@
+---
+title: "nonparametricSummaryPSM"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{nonparametricSummaryPSM}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(nonparametricSummaryPSM)
+```
+
+## Combining similarity matrices using nonparametric Bayesian methods
+
+This R package combines multiple similarity matrices between the same objects using Bayesian nonparametrics, as in 
+Strauß et al. (2019). GPseudoClust: deconvolution of shared pseudo-trajectories at single-cell resolution. 
+
+The similarity matrices may be distance or correlation matrices, or posterior similarity matrices (PSMs) summarising the output from Bayesian nonparameteric clustering algorithms obtained by running MCMC chains on subsets of the input data. 
+
+The data file examplePSMs.rda contains an array of 24 PSMs from MCMC chains run on subsets of the input data. 
+
+```{r echo=T, results='hide'}
+data("examplePSMs")
+npSummaryPSM <- processPSMs(PSMs)
+```
+
+Now we check convergence
+
+```{r echo=T, results='hide'}
+convExample <- checkConvergence(PSMs)
+```
+
+Convergence plots
+
+```{r,echo=T}
+library(ggplot2)
+dist_Frobenius <- c(convExample$distPY,convExample$distDP)/nrow(convExample$results[[1]]$weightedPSM)^2
+method <- c(rep("DPM+PEAR",length(convExample$distPY)),rep("PY+PEAR",length(convExample$distPY)))
+number_Chains <- seq(3,24,1)
+dist_Frobenius <- data.frame(dist_Frobenius=dist_Frobenius,number_Chains=number_Chains,method=method)
+p <- ggplot(dist_Frobenius,aes(x=number_Chains,y=dist_Frobenius)) + geom_line(aes(color=method)) + geom_point(aes(color=method))+
+  scale_y_continuous(name = "Frobenius distance/# matrix elements")+theme(text=element_text(size=12),axis.text=element_text(size=12))+
+  scale_x_continuous(name="number of chains")+theme(legend.position="top")
+p
+```
+
+```{r,echo=T}
+cophPY <- convExample$coph[[length(convExample$coph)]]
+cophDPM <- convExample$coph_DP[[length(convExample$coph)]]
+method <- c(rep("DPM+PEAR",length(cophPY)),rep("PY+PEAR",length(cophPY)))
+coph <- c(cophPY,cophDPM)
+number_Chains <- seq(2,24,1)
+cophDF <- data.frame(coph=coph,method=method,number_Chains=number_Chains)
+p <- ggplot(cophDF,aes(x=number_Chains,y=coph)) + geom_line(aes(color=method)) + geom_point(aes(color=method))+
+  scale_y_continuous(name = "cophenetic correlation")+theme(text=element_text(size=12),axis.text=element_text(size=12))+
+  scale_x_continuous(name="number of chains")+theme(legend.position="top")
+p
+```
+
+```{r,echo=T}
+cophPYRel <- cophPY/cophPY[length(cophPY)]
+cophDPMRel <- cophDPM/cophDPM[length(cophDPM)]
+coph <- c(cophPYRel,cophDPMRel)
+number_Chains <- seq(2,24,1)
+cophDF <- data.frame(coph=coph,method=method,number_Chains=number_Chains)
+p <- ggplot(cophDF,aes(x=number_Chains,y=coph)) + geom_line(aes(color=method)) + geom_point(aes(color=method))+
+  scale_y_continuous(name = "ratio of cophenetic correlation")+theme(text=element_text(size=12),axis.text=element_text(size=12))+
+  scale_x_continuous(name="number of chains")+theme(legend.position="top")
+p
+```
+
+
+
+
+
+
+

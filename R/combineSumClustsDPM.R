@@ -101,7 +101,6 @@ computeWeightsSumClustDPM = function(allocs)
 #' @return weights: weights which were used for the computation of the summary PSM (Pitman-Yor based model)
 #' @return weights_DP: weights which were used for the computation of the summary PSM (Dirichlet based model)
 #' @author Magdalena Strauss
-#' @example load("examplePSMs.rda") sumPSM <- processPSMs(PSMS)
 #' @export
 
 processPSMs <- function(PSMs)
