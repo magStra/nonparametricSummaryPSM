@@ -8,6 +8,8 @@ computeSumClustPEAR(PSM, maxCl = 10)
 }
 \arguments{
 \item{PSM}{posterior similarity matrix}
+
+\item{maxCl}{maximum number of clusters}
 }
 \value{
 Summary clustering computed using the PEAR criterion (Fritsch and Ickstadt, 2009, using the mcclust package

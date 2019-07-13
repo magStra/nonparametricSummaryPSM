@@ -6,6 +6,7 @@
 #' Internal function
 #' @title computeSumClustPear
 #' @param PSM posterior similarity matrix
+#' @param maxCl maximum number of clusters
 #' @return Summary clustering computed using the PEAR criterion (Fritsch and Ickstadt, 2009, using the mcclust package
 #'  (Fritsch, 2012))
 #' @author Magdalena Strauss
@@ -17,7 +18,7 @@ computeSumClustPEAR = function(PSM,maxCl=10)
 
 #' Internal function
 #' @title computeWeightsSumClust
-#' @param allocs
+#' @param allocs matrix where each row is a different full set of cluster allocations of all the samples
 #' @return PSM and summary clustering obtained from Pitman-Yor process with allocs as input,
 #' weights used to compute the summary PSM from the individual PSMs
 #' @author Magdalena Strauss
@@ -55,7 +56,7 @@ computeWeightsSumClust = function(allocs)
 
 #' Internal function
 #' @title computeWeightsSumClustDPM
-#' @param allocs
+#' @param allocs matrix where each row is a different full set of cluster allocations of all the samples
 #' @return PSM and summary clustering obtained from Dirichlet process with allocs as input,
 #' weights used to compute the summary PSM from the individual PSMs
 #' @author Magdalena Strauss
@@ -205,9 +206,9 @@ checkConvergence <- function(PSMs)
 }
 
 #' @title RhatConcentration
-#' @param concentrationSamples: nIterations x nChains matrix of nIterations samples of the concentration
+#' @param concentrationSamples nIterations x nChains matrix of nIterations samples of the concentration
 #' parameter alpha for each of nChains subsampled chains
-#' @param nChainsTest: number of subsamples for which we want to test if the number of sufficient for convergence
+#' @param nChainsTest number of subsamples for which we want to test if the number of sufficient for convergence
 #' @return GR-statistics across subsampled chains (see Strauss et al. 2019) for groups of
 #' @author Magdalena Strauss
 #' @export

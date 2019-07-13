@@ -6,6 +6,9 @@
 \usage{
 computeWeightsSumClustDPM(allocs)
 }
+\arguments{
+\item{allocs}{matrix where each row is a different full set of cluster allocations of all the samples}
+}
 \value{
 PSM and summary clustering obtained from Dirichlet process with allocs as input,
 weights used to compute the summary PSM from the individual PSMs

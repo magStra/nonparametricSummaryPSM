@@ -6,3 +6,8 @@ export(computeSumClustPEAR)
 export(computeWeightsSumClust)
 export(computeWeightsSumClustDPM)
 export(processPSMs)
+
+import(PReMiuM)
+import(coda)
+import(ggplot2)
+import(mcclust)

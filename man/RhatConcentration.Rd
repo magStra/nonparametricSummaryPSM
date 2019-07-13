@@ -7,10 +7,10 @@
 RhatConcentration(concentrationSamples, nChainsTest)
 }
 \arguments{
-\item{concentrationSamples:}{nIterations x nChains matrix of nIterations samples of the concentration
+\item{concentrationSamples}{nIterations x nChains matrix of nIterations samples of the concentration
 parameter alpha for each of nChains subsampled chains}
 
-\item{nChainsTest:}{number of subsamples for which we want to test if the number of sufficient for convergence}
+\item{nChainsTest}{number of subsamples for which we want to test if the number of sufficient for convergence}
 }
 \value{
 GR-statistics across subsampled chains (see Strauss et al. 2019) for groups of
